@@ -49,49 +49,21 @@
 		
 	End Function
 	
-	Function GetEncodedPassword (PasswordInput)
-	
-		Set this_asc = Server.CreateObject("System.Text.UTF8Encoding")
-		Set enc = Server.CreateObject("System.Security.Cryptography.SHA1CryptoServiceProvider")
-	
-		bytes = this_asc.GetBytes_4(PasswordInput)
-		bytes = enc.ComputeHash_2((bytes))
-	
-		encodedPassword = ""
-	
-		For pos = 1 To Lenb(bytes)
-			encodedPassword = encodedPassword & LCase(Right("0" & Hex(Ascb(Midb(bytes, pos, 1))), 2))
-		Next
+	Function GetWeek ()
 		
-		GetEncodedPassword = encodedPassword
-	
-	End Function
-	
-	Function PCase (strInput)
+		liveSLFFL = "http://api.cbssports.com/fantasy/league/scoring/live?version=3.0&response_format=xml&league_id=samelevel&access_token=" & GetToken("SLFFL")
+		Set xmlhttpSLFFL = Server.CreateObject("Microsoft.XMLHTTP")
 		
-		Dim iPosition  ' Our current position in the string (First character = 1)
-		Dim iSpace     ' The position of the next space after our iPosition
-		Dim strOutput  ' Our temporary string used to build the function's output
-	
-		If InStr(strInput, "-") Then strInput = Replace(strInput, "-", " ")
-		'If InStr(strInput, "~") Then strInput = Replace(strInput, "~", "-")
+		xmlhttpSLFFL.open "GET", liveSLFFL, false
+		xmlhttpSLFFL.send ""
 		
-		iPosition = 1
-	
-		Do While InStr(iPosition, strInput, " ", 1) <> 0
-			
-			iSpace = InStr(iPosition, strInput, " ", 1)
+		Set oXML = CreateObject("MSXML2.DOMDocument.3.0")
+		oXML.loadXML(xmlhttpSLFFL.ResponseText)
 		
-			strOutput = strOutput & UCase(Mid(strInput, iPosition, 1))
-			strOutput = strOutput & LCase(Mid(strInput, iPosition + 1, iSpace - iPosition))
-			iPosition = iSpace + 1
-			
-		Loop
-		
-		strOutput = strOutput & UCase(Mid(strInput, iPosition, 1))
-		strOutput = strOutput & LCase(Mid(strInput, iPosition + 1))
-		
-		PCase = strOutput
+		Set objTeams = oXML.getElementsByTagName("period")
+		Set objTeam = objTeams.item(0)
+		GetWeek = objTeam.text
 		
 	End Function
+		
 %>

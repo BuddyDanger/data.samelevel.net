@@ -9,7 +9,8 @@
 		
 		<meta charset="UTF-8">
 		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-		
+		<meta http-equiv="refresh" content="30" />
+
 		<link href="/build/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 		<link href="/build/css/main.css" rel="stylesheet" type="text/css" />
 		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
@@ -55,6 +56,7 @@
 										thisTeamName = objTeam.childNodes(13).text
 										thisTeamScore = objTeam.childNodes(19).text
 										thisTeamLogo = objTeam.childNodes(17).text
+										thisTeamPMR = objTeam.childNodes(20).text
 										Opponent1ID = objTeam.childNodes(6).childNodes(0).childNodes(3).text
 										Opponent1Score = objTeam.childNodes(6).childNodes(0).childNodes(0).text
 										Opponent1Name  = objTeam.childNodes(6).childNodes(0).childNodes(4).text
@@ -64,7 +66,7 @@
 										MatchupID1 = objTeam.childNodes(6).childNodes(0).GetAttribute("id")
 										MatchupID2 = objTeam.childNodes(6).childNodes(1).GetAttribute("id")
 										
-										TeamDetails = TeamDetails & thisTeamID & "|" & thisTeamName & "|" & thisTeamLogo & "+"
+										TeamDetails = TeamDetails & thisTeamID & "|" & thisTeamName & "|" & thisTeamLogo & "|" & thisTeamPMR & "+"
 										
 										useMatchup1 = 1
 										useMatchup2 = 1
@@ -108,24 +110,47 @@
 											If arTeam(0) = TeamID1 Then
 												TeamName1 = arTeam(1)
 												TeamLogo1 = arTeam(2)
+												TeamPMR1  = arTeam(3)
 											End If
 											
 											If arTeam(0) = TeamID2 Then
 												TeamName2 = arTeam(1)
 												TeamLogo2 = arTeam(2)
+												TeamPMR2  = arTeam(3)
 											End If
 										
 										Next
 										
+										TeamPMRColor1 = "success"
+										If TeamPMR1 < 321 Then TeamPMRColor1 = "warning"
+										If TeamPMR1 < 161 Then TeamPMRColor1 = "danger"
+										
+										TeamPMRColor2 = "success"
+										If TeamPMR2 < 321 Then TeamPMRColor2 = "warning"
+										If TeamPMR2 < 161 Then TeamPMRColor2 = "danger"
+										
+										TeamPMRPercent1 = (TeamPMR1 * 100) / 480
+										TeamPMRPercent2 = (TeamPMR2 * 100) / 480
+										
 										Response.Write("<div class=""col-sm-6"">")
 											Response.Write("<ul class=""list-group"">")
 												Response.Write("<li class=""list-group-item"">")
-													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #ddd; color: #444444;"">" & TeamScore1 & "</span>")
-													Response.Write("<img src=""" & TeamLogo1 & """ /> <b>" & TeamName1 & "</b>")
+													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #fff; color: #444444;"">" & TeamScore1 & "</span>")
+													Response.Write("<img src=""" & TeamLogo1 & """ /> <span style=""font-size: 16px""><b>" & TeamName1 & "</b></span>")
+													Response.Write("<div class=""progress"" style=""height: 2px; margin-top: 5px; margin-bottom: 0; padding-bottom: 0;"">")
+														Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor1 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent1 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent1 & "%"">")
+															Response.Write("<span class=""sr-only"">" & TeamPMRPercent1 & "%</span>")
+														Response.Write("</div>")
+													Response.Write("</div>")
 												Response.Write("</li>")
 												Response.Write("<li class=""list-group-item"">")
-													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #ddd; color: #444444;"">" & TeamScore2 & "</span>")
-													Response.Write("<img src=""" & TeamLogo2 & """ /> <b>" & TeamName2 & "</b>")
+													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #fff; color: #444444;"">" & TeamScore2 & "</span>")
+													Response.Write("<img src=""" & TeamLogo2 & """ /> <span style=""font-size: 16px""><b>" & TeamName2 & "</b></span>")
+													Response.Write("<div class=""progress"" style=""height: 2px; margin-top: 5px; margin-bottom: 0; padding-bottom: 0;"">")
+														Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor2 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent2 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent2 & "%"">")
+															Response.Write("<span class=""sr-only"">" & TeamPMRPercent2 & "%</span>")
+														Response.Write("</div>")
+													Response.Write("</div>")
 												Response.Write("</li>")
 											Response.Write("</ul>")
 										Response.Write("</div>")
@@ -157,6 +182,7 @@
 										thisTeamName = objTeam.childNodes(13).text
 										thisTeamScore = objTeam.childNodes(19).text
 										thisTeamLogo = objTeam.childNodes(17).text
+										thisTeamPMR = objTeam.childNodes(20).text
 										Opponent1ID = objTeam.childNodes(6).childNodes(0).childNodes(3).text
 										Opponent1Score = objTeam.childNodes(6).childNodes(0).childNodes(0).text
 										Opponent1Name  = objTeam.childNodes(6).childNodes(0).childNodes(4).text
@@ -166,7 +192,7 @@
 										MatchupID1 = objTeam.childNodes(6).childNodes(0).GetAttribute("id")
 										MatchupID2 = objTeam.childNodes(6).childNodes(1).GetAttribute("id")
 										
-										TeamDetails = TeamDetails & thisTeamID & "|" & thisTeamName & "|" & thisTeamLogo & "+"
+										TeamDetails = TeamDetails & thisTeamID & "|" & thisTeamName & "|" & thisTeamLogo & "|" & thisTeamPMR & "+"
 										
 										useMatchup1 = 1
 										useMatchup2 = 1
@@ -210,14 +236,27 @@
 											If arTeam(0) = TeamID1 Then
 												TeamName1 = arTeam(1)
 												TeamLogo1 = arTeam(2)
+												TeamPMR1  = arTeam(3)
 											End If
 											
 											If arTeam(0) = TeamID2 Then
 												TeamName2 = arTeam(1)
 												TeamLogo2 = arTeam(2)
+												TeamPMR2  = arTeam(3)
 											End If
 										
 										Next
+										
+										TeamPMRColor1 = "success"
+										If TeamPMR1 < 321 Then TeamPMRColor1 = "warning"
+										If TeamPMR1 < 161 Then TeamPMRColor1 = "danger"
+										
+										TeamPMRColor2 = "success"
+										If TeamPMR2 < 321 Then TeamPMRColor2 = "warning"
+										If TeamPMR2 < 161 Then TeamPMRColor2 = "danger"
+										
+										TeamPMRPercent1 = (TeamPMR1 * 100) / 480
+										TeamPMRPercent2 = (TeamPMR2 * 100) / 480
 										
 										If InStr(TeamName1, "nchen on B") Then TeamName1 = "M&uuml;nchen on B&uuml;ndchen"
 										If InStr(TeamName2, "nchen on B") Then TeamName2 = "M&uuml;nchen on B&uuml;ndchen"
@@ -225,12 +264,22 @@
 										Response.Write("<div class=""col-sm-6"">")
 											Response.Write("<ul class=""list-group"">")
 												Response.Write("<li class=""list-group-item"">")
-													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #ddd; color: #444444;"">" & TeamScore1 & "</span>")
-													Response.Write("<img src=""" & TeamLogo1 & """ /> <b>" & TeamName1 & "</b>")
+													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #fff; color: #444444;"">" & TeamScore1 & "</span>")
+													Response.Write("<img src=""" & TeamLogo1 & """ /> <span style=""font-size: 16px""><b>" & TeamName1 & "</b></span>")
+													Response.Write("<div class=""progress"" style=""height: 2px; margin-top: 5px; margin-bottom: 0; padding-bottom: 0;"">")
+														Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor1 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent1 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent1 & "%"">")
+															Response.Write("<span class=""sr-only"">" & TeamPMRPercent1 & "%</span>")
+														Response.Write("</div>")
+													Response.Write("</div>")
 												Response.Write("</li>")
 												Response.Write("<li class=""list-group-item"">")
-													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #ddd; color: #444444;"">" & TeamScore2 & "</span>")
-													Response.Write("<img src=""" & TeamLogo2 & """ /> <b>" & TeamName2 & "</b>")
+													Response.Write("<span class=""badge"" style=""font-size: 2.1em; background-color: #fff; color: #444444;"">" & TeamScore2 & "</span>")
+													Response.Write("<img src=""" & TeamLogo2 & """ /> <span style=""font-size: 16px""><b>" & TeamName2 & "</b></span>")
+													Response.Write("<div class=""progress"" style=""height: 2px; margin-top: 5px; margin-bottom: 0; padding-bottom: 0;"">")
+														Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor2 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent2 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent2 & "%"">")
+															Response.Write("<span class=""sr-only"">" & TeamPMRPercent2 & "%</span>")
+														Response.Write("</div>")
+													Response.Write("</div>")
 												Response.Write("</li>")
 											Response.Write("</ul>")
 										Response.Write("</div>")
