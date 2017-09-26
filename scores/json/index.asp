@@ -110,8 +110,8 @@
 					
 					If matchupPMR = 0 Then
 						matchupStatus = "good"
-						If TeamScore1 > TeamScore2 Then matchupLogo = TeamLogo1
-						If TeamScore2 > TeamScore1 Then matchupLogo = TeamLogo2
+						If TeamScore1 < TeamScore2 Then matchupLogo = TeamLogo1
+						If TeamScore2 < TeamScore1 Then matchupLogo = TeamLogo2
 					End If
 					
 					slackJSON = slackJSON & "{"
