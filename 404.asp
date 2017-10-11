@@ -124,94 +124,25 @@
 	Session.Contents("QBX_View_User_Name") = ""
 	Session.Contents("QBX_View_User_Avatar") = ""	
 	
-	If Session.Contents("SITE_Level_1") = "quarterbacks" Then
+	If Session.Contents("SITE_Level_1") = "scores" Then
 	
-		Level02 = LCase(Session.Contents("SITE_Level_2"))
-		Level03 = LCase(Session.Contents("SITE_Level_3"))
-		Level04 = LCase(Session.Contents("SITE_Level_4"))
-		
-		If Len(Level02) > 0 Then LevelString = LevelString & "||" & Level02
-		If Len(Level03) > 0 Then LevelString = LevelString & "||" & Level03
-		If Len(Level04) > 0 Then LevelString = LevelString & "||" & Level04
-		
-		arLevels = Split(LevelString, "||")
-		
-		Session.Contents("QBX_Current_QB_ID") = ""
-		Session.Contents("QBX_Current_QB_Name") = ""
-		
-		SetQB = 0
-		
-		For Each Level In arLevels
-		
-			If SetQB = 0 Then
+		If Session.Contents("SITE_Level_2") = "matchups" Then
+	
+			If Session.Contents("SITE_Level_3") = "slffl" Then Session.Contents("Scores_Matchup_League") = "slffl"
+			If Session.Contents("SITE_Level_3") = "farm" Then Session.Contents("Scores_Matchup_League") = "farm"
 			
-				SearchString = Level
-				If InStr(SearchString, "-") Then SearchString = Replace(SearchString, "-", " ")
-				
-				sqlGetQB = "SELECT qbx_quarterbacks.qb_ID, qbx_quarterbacks.qb_Active, qbx_quarterbacks.qb_Name, qbx_quarterbacks.qb_StockPrice, qbx_teams.team_Color_Primary, qbx_teams.team_Color_Secondary, qbx_teams.team_Logo FROM qbx_quarterbacks INNER JOIN qbx_teams ON qbx_teams.team_ID = qbx_quarterbacks.qb_Team WHERE qbx_quarterbacks.qb_Name = '" & SearchString & "'"
-				Set rsQB = sqlSameLevel.Execute(sqlGetQB)
-				
-				If Not rsQB.Eof Then
-				
-					Session.Contents("QBX_Current_QB_ID") = rsQB("qb_ID")
-					Session.Contents("QBX_Current_QB_Name") = rsQB("qb_Name")
-					Session.Contents("QBX_Current_QB_PrimaryColor") = rsQB("team_Color_Primary")
-					Session.Contents("QBX_Current_QB_SecondaryColor") = rsQB("team_Color_Secondary")
-					SetQB = 1
-					DeadPage = 0
-					sTransferURL = "profile.asp"
-					
-					sqlGetCurrentWeek = "SELECT * FROM qbx_current"
-					Set rsCurrentWeek = sqlSameLevel.Execute(sqlGetCurrentWeek)
-					
-					current_Year = rsCurrentWeek("qbx_Current_Year")
-					current_Week = rsCurrentWeek("qbx_Current_Week")
-					
-					rsCurrentWeek.Close
-					Set rsCurrentWeek = Nothing
-					
-					sqlGetStockPrice = "SELECT price_Value FROM qbx_prices WHERE game_Year = " & current_Year & " AND game_Week = " & current_Week & " AND qb_ID = " & Session.Contents("QBX_Current_QB_ID")
-					Set rsStockPrice = sqlSameLevel.Execute(sqlGetStockPrice)
-					
-					Session.Contents("QBX_Current_QB_StockPrice") = rsStockPrice("price_Value")
-					
-					rsStockPrice.Close
-					Set rsStockPrice = Nothing
-				
-				End If
+			MatchupWeek = Session.Contents("SITE_Level_4")
+			MatchupID   = Session.Contents("SITE_Level_5")
 			
-			End If
+			Session.Contents("Scores_Matchup_Week") = MatchupWeek
+			Session.Contents("Scores_Matchup_ID") = MatchupID
 		
-		Next
-	
-	End If
-	
-	If Session.Contents("SITE_Level_1") = "portfolio" Then
-	
-		safeUserName = LCase(Session.Contents("SITE_Level_2"))
-		If InStr(safeUserName, "-") Then safeUserName = Replace(safeUserName, "-", " ")
-				
-		sqlGetUser = "SELECT * FROM qbx_users WHERE qbx_Name = '" & safeUserName & "'"
-		Set rsUser = sqlSameLevel.Execute(sqlGetUser)
-		
-		If Not rsUser.Eof Then
-		
-			Session.Contents("QBX_View_User_ID") = rsUser("qbx_ID")
-			Session.Contents("QBX_View_User_Name") = rsUser("qbx_Name")
-			Session.Contents("QBX_View_User_Avatar") = rsUser("qbx_Avatar")
-			
+			sTransferURL = "matchups/index.asp"
 			DeadPage = 0
-			sTransferURL = "view.asp"
-						
-			rsUser.Close
-			Set rsUser = Nothing
-		
+	
 		End If
 		
 	End If
-	
-	sqlSameLevel.Close
-	Set sqlSameLevel = Nothing
 	
 	If DeadPage = 0 Then
 	

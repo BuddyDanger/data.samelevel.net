@@ -1,11 +1,31 @@
 <!DOCTYPE html>
 <!--#include virtual="/adovbs.inc"-->
 <!--#include virtual="/build/asp/functions.asp"-->
+<%
+	Set oXML = CreateObject("MSXML2.DOMDocument.3.0")
+	oXML.loadXML(GetScores(Session.Contents("Scores_Matchup_League")))
+	oXML.setProperty "SelectionLanguage", "XPath"
+	Set objMatchup = oXML.selectSingleNode(".//matchup[@id = " & Session.Contents("Scores_Matchup_ID") & "]")
+	
+	TeamID1 = objMatchup.childNodes(5).childNodes(0).text
+	TeamID2 = objMatchup.childNodes(5).childNodes(1).text
+	
+	Set objTeam1 = oXML.selectSingleNode(".//team[@id = " & TeamID1 & "]")
+	Set objTeam2 = oXML.selectSingleNode(".//team[@id = " & TeamID2 & "]")
+	
+	TeamName1 = objTeam1.childNodes(13).text
+	TeamScore1 = objTeam1.childNodes(19).text
+	TeamPMR1 = objTeam1.childNodes(20).text
+	
+	TeamName2 = objTeam2.childNodes(13).text
+	TeamScore2 = objTeam2.childNodes(19).text
+	TeamPMR2 = objTeam2.childNodes(20).text	
+%>
 <html>
 	
 	<head>
 		
-		<title>Live Scoring - Same Level Fantasy Football League</title>
+		<title><%= TeamName1 %> vs. <%= TeamName2 %> - Live Scoring - Same Level Fantasy Football League</title>
 		
 		<meta charset="UTF-8">
 		<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
@@ -37,9 +57,106 @@
 				
 					<div class="row">
 						
-						<div class="col-lg-6 col-md-12">
+						<div class="col-lg-3 col-md-6">
+						
+							<div class="list-group">
+								<a href="#" class="list-group-item active">
+									<h4 class="list-group-item-heading"><%= TeamName1 %></h4>
+								</a>
 <%
-							Response.Write("<div class=""row"">")
+									Set objPlayers1 = objTeam1.getElementsByTagName("player")
+		
+									For i = 0 to (objPlayers1.length - 1)
+										
+										Set objPlayer = objPlayers1.item(i)
+										
+										If objPlayer.childNodes(3).text = "Active" Then
+										
+											thisTeamID = objPlayer.getAttribute("id")
+											Set PlayerName = objPlayer.getElementsByTagName("fullname")
+											thisPlayerName = PlayerName.item(0).text
+											thisPlayerScore = objPlayer.childNodes(9).text
+											thisPlayerScore = FormatNumber(thisPlayerScore, 2)
+											
+											Response.Write("<a href=""#"" class=""list-group-item""><span style=""float: right;"">" & thisPlayerScore & "</span><p class=""list-group-item-text"">" & thisPlayerName & "</p><p class=""list-group-item-text"">stat line here</p></a>")
+
+										End If	
+
+									Next
+									
+									For i = 0 to (objPlayers1.length - 1)
+										
+										Set objPlayer = objPlayers1.item(i)
+										
+										If objPlayer.childNodes(3).text = "Reserve" Then
+										
+											thisTeamID = objPlayer.getAttribute("id")
+											Set PlayerName = objPlayer.getElementsByTagName("fullname")
+											thisPlayerName = PlayerName.item(0).text
+											thisPlayerScore = objPlayer.childNodes(9).text
+											thisPlayerScore = FormatNumber(thisPlayerScore, 2)
+											
+											Response.Write("<a href=""#"" class=""list-group-item disabled""><span style=""float: right;"">" & thisPlayerScore & "</span><p class=""list-group-item-text"">" & thisPlayerName & "</p></a>")
+
+										End If	
+
+									Next
+%>
+							</div>
+						
+						</div>
+						
+						<div class="col-lg-3 col-md-6">
+						
+							<div class="list-group">
+								<a href="#" class="list-group-item active">
+									<h4 class="list-group-item-heading"><%= TeamName2 %></h4>
+								</a>
+<%
+									Set objPlayers2 = objTeam2.getElementsByTagName("player")
+		
+									For i = 0 to (objPlayers2.length - 1)
+										
+										Set objPlayer = objPlayers2.item(i)
+										
+										If objPlayer.childNodes(3).text = "Active" Then
+										
+											thisTeamID = objPlayer.getAttribute("id")
+											Set PlayerName = objPlayer.getElementsByTagName("fullname")
+											thisPlayerName = PlayerName.item(0).text
+											thisPlayerScore = objPlayer.childNodes(9).text
+											thisPlayerScore = FormatNumber(thisPlayerScore, 2)
+											
+											Response.Write("<a href=""#"" class=""list-group-item""><span style=""float: right;"">" & thisPlayerScore & "</span><p class=""list-group-item-text"">" & thisPlayerName & "</p><p class=""list-group-item-text"">stat line here</p></a>")
+
+										End If	
+
+									Next
+									
+									For i = 0 to (objPlayers2.length - 1)
+										
+										Set objPlayer = objPlayers2.item(i)
+										
+										If objPlayer.childNodes(3).text = "Reserve" Then
+										
+											thisTeamID = objPlayer.getAttribute("id")
+											Set PlayerName = objPlayer.getElementsByTagName("fullname")
+											thisPlayerName = PlayerName.item(0).text
+											thisPlayerScore = objPlayer.childNodes(9).text
+											thisPlayerScore = FormatNumber(thisPlayerScore, 2)
+											
+											Response.Write("<a href=""#"" class=""list-group-item disabled""><span style=""float: right;"">" & thisPlayerScore & "</span><p class=""list-group-item-text"">" & thisPlayerName & "</p></a>")
+
+										End If	
+
+									Next
+%>
+							</div>
+						
+						</div>
+						
+						
+<%
 												
 								Set oXML = CreateObject("MSXML2.DOMDocument.3.0")
 								oXML.async = "false"
@@ -62,7 +179,6 @@
 									thisTeamPMR = objTeam.childNodes(20).text
 									
 									Set objMatchup = objTeam.selectSingleNode(".//matchups")
-									
 									
 									Opponent1ID = objMatchup.childNodes(0).childNodes(3).text
 									Opponent1Score = objMatchup.childNodes(0).childNodes(0).text
@@ -256,11 +372,12 @@
 									TOTAL_Points_SLFFL = TOTAL_Points_SLFFL + TeamScore1 + TeamScore2
 									TOTAL_PMR_SLFFL = TOTAL_PMR_SLFFL + TeamPMR1 + TeamPMR2
 					
-									Response.Write("<div class=""col-sm-6"">")
+									Response.Write("<div class=""col-lg-2"">")
+										Response.Write("<a href=""/scores/matchups/slffl/6/" & MatchupID & "/"">")
 										Response.Write("<ul class=""list-group"">")
 											Response.Write("<li class=""list-group-item team-slffl-box-" & TeamID1 & """>")
 												Response.Write("<span class=""badge team-slffl-score-" & TeamID1 & """ style=""font-size: 1.9em; background-color: #fff; color: #444444;"">" & TeamScore1 & "</span>")
-												Response.Write("<img src=""" & TeamLogo1 & """ width=""29"" /> <span style=""font-size: 15px""><b>" & TeamName1 & "</b></span>")
+												Response.Write("<img src=""" & TeamLogo1 & """ width=""29"" /> <span style=""font-size: 15px; color: #2d2d2d;""><b>" & TeamName1 & "</b></span>")
 												Response.Write("<div class=""progress"" style=""height: 1px; margin-top: 4px; margin-bottom: 0; padding-bottom: 0;"">")
 													Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor1 & " team-slffl-progress-" & TeamID1 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent1 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent1 & "%"">")
 														Response.Write("<span class=""sr-only team-slffl-progress-sr-" & TeamID1 & """>" & TeamPMRPercent1 & "%</span>")
@@ -270,7 +387,7 @@
 											Response.Write("</li>")
 											Response.Write("<li class=""list-group-item team-slffl-box-" & TeamID2 & """>")
 												Response.Write("<span class=""badge team-slffl-score-" & TeamID2 & """ style=""font-size: 1.9em; background-color: #fff; color: #444444;"">" & TeamScore2 & "</span>")
-												Response.Write("<img src=""" & TeamLogo2 & """ width=""29"" /> <span style=""font-size: 15px""><b>" & TeamName2 & "</b></span>")
+												Response.Write("<img src=""" & TeamLogo2 & """ width=""29"" /> <span style=""font-size: 15px; color: #2d2d2d;""><b>" & TeamName2 & "</b></span>")
 												Response.Write("<div class=""progress"" style=""height: 1px; margin-top: 4px; margin-bottom: 0; padding-bottom: 0;"">")
 													Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor2 & " team-slffl-progress-" & TeamID2 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent2 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent2 & "%"">")
 														Response.Write("<span class=""sr-only team-slffl-progress-sr-" & TeamID2 & """>" & TeamPMRPercent2 & "%</span>")
@@ -279,21 +396,16 @@
 												Response.Write("<span style=""display: none;"" class=""team-slffl-touchdowns-" & TeamID2 & """>" & TeamTDS2 & "</span>")
 											Response.Write("</li>")
 										Response.Write("</ul>")
+										Response.Write("</a>")
 									Response.Write("</div>")
 					
 								Next
 					
-							Response.Write("</div>")
 									
 							MatchupString = ""
 							TeamDetails = ""
 							MatchupTrail = "0,"
-%>
-						</div>
-
-						<div class="col-lg-6 col-md-12">
-<%
-							Response.Write("<div class=""row"">")
+							
 												
 								Set oXML = CreateObject("MSXML2.DOMDocument.3.0")
 								oXML.async = "false"
@@ -315,16 +427,104 @@
 									thisTeamLogo = objTeam.childNodes(17).text
 									thisTeamPMR = objTeam.childNodes(20).text
 									
-									Opponent1ID = objTeam.childNodes(6).childNodes(0).childNodes(3).text
-									Opponent1Score = objTeam.childNodes(6).childNodes(0).childNodes(0).text
-									Opponent1Name  = objTeam.childNodes(6).childNodes(0).childNodes(4).text
-									Opponent2ID = objTeam.childNodes(6).childNodes(1).childNodes(3).text
-									Opponent2Score = objTeam.childNodes(6).childNodes(1).childNodes(0).text
-									Opponent2Name  = objTeam.childNodes(6).childNodes(1).childNodes(4).text
-									MatchupID1 = objTeam.childNodes(6).childNodes(0).GetAttribute("id")
-									MatchupID2 = objTeam.childNodes(6).childNodes(1).GetAttribute("id")
+									Set objMatchup = objTeam.selectSingleNode(".//matchups")
 									
-									TeamDetails = TeamDetails & thisTeamID & "|" & thisTeamName & "|" & thisTeamLogo & "|" & thisTeamPMR & "+"
+									Opponent1ID = objMatchup.childNodes(0).childNodes(3).text
+									Opponent1Score = objMatchup.childNodes(0).childNodes(0).text
+									Opponent1Name  = objMatchup.childNodes(0).childNodes(4).text
+									Opponent2ID = objMatchup.childNodes(1).childNodes(3).text
+									Opponent2Score = objMatchup.childNodes(1).childNodes(0).text
+									Opponent2Name  = objMatchup.childNodes(1).childNodes(4).text
+									MatchupID1 = objMatchup.childNodes(0).GetAttribute("id")
+									MatchupID2 = objMatchup.childNodes(1).GetAttribute("id")
+									
+									thisTeamTouchdowns = 0
+									PlayerStatLine = ""
+									Set objPlayers = objTeam.getElementsByTagName("player")
+									
+									For j = 0 to (objPlayers.length - 1)
+									
+										Set objPlayer = objPlayers.item(j)
+										
+										If LCase(objPlayer.childNodes(3).text) = "active" Then
+									
+											PlayerStatLine = LCase(objPlayer.childNodes(1).text)
+											
+											If InStr(PlayerStatLine, ", ") Then
+											
+												arPlayerStatLine = Split(PlayerStatLine, ", ")
+												
+												For Each StatLine In arPlayerStatLine
+												
+													If InStr(StatLine, " patd") Then
+														arTouchdowns = Split(StatLine, " patd")
+														thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+													Else
+														If InStr(StatLine, "patd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+													End If
+													
+													If InStr(StatLine, " rutd") Then
+														arTouchdowns = Split(StatLine, " rutd")
+														thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+													Else
+														If InStr(StatLine, "rutd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+													End If
+													
+													If InStr(StatLine, " retd") Then
+														arTouchdowns = Split(StatLine, " retd")
+														thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+													Else
+														If InStr(StatLine, "retd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+													End If
+													
+													If InStr(StatLine, " dtd") Then
+														arTouchdowns = Split(StatLine, " dtd")
+														thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+													Else
+														If InStr(StatLine, "dtd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+													End If
+												
+												Next
+												
+											Else
+											
+												If InStr(PlayerStatLine, " patd") Then
+													arTouchdowns = Split(PlayerStatLine, " patd")
+													thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+												Else
+													If InStr(PlayerStatLine, "patd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+												End If
+												
+												If InStr(PlayerStatLine, " rutd") Then
+													arTouchdowns = Split(PlayerStatLine, " rutd")
+													thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+												Else
+													If InStr(PlayerStatLine, "rutd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+												End If
+												
+												If InStr(PlayerStatLine, " retd") Then
+													arTouchdowns = Split(PlayerStatLine, " retd")
+													thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+												Else
+													If InStr(PlayerStatLine, "retd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+												End If
+												
+												If InStr(PlayerStatLine, " dtd") Then
+													arTouchdowns = Split(PlayerStatLine, " dtd")
+													thisTeamTouchdowns = thisTeamTouchdowns + arTouchdowns(0)
+												Else
+													If InStr(PlayerStatLine, "dtd") Then thisTeamTouchdowns = thisTeamTouchdowns + 1
+												End If
+											
+											End If
+											
+										End If
+										
+									Next
+									
+									
+									
+									TeamDetails = TeamDetails & thisTeamID & "|" & thisTeamName & "|" & thisTeamLogo & "|" & thisTeamPMR & "|" & thisTeamTouchdowns & "+"
 									
 									useTeam = 1
 									
@@ -395,12 +595,14 @@
 											TeamName1 = arTeam(1)
 											TeamLogo1 = arTeam(2)
 											TeamPMR1  = arTeam(3)
+											TeamTDS1  = arTeam(4)
 										End If
 										
 										If arTeam(0) = TeamID2 Then
 											TeamName2 = arTeam(1)
 											TeamLogo2 = arTeam(2)
 											TeamPMR2  = arTeam(3)
+											TeamTDS2  = arTeam(4)
 										End If
 									
 									Next
@@ -419,104 +621,36 @@
 									TOTAL_Points_FARM = TOTAL_Points_FARM + TeamScore1 + TeamScore2
 									TOTAL_PMR_FARM = TOTAL_PMR_FARM + TeamPMR1 + TeamPMR2
 					
-									Response.Write("<div class=""col-sm-6"">")
+									Response.Write("<div class=""col-lg-2"">")
+										Response.Write("<a href=""/scores/matchups/farm/6/" & MatchupID & "/"">")
 										Response.Write("<ul class=""list-group"">")
-											Response.Write("<li class=""list-group-item team-farm-box-" & TeamID1 & """>")
-												Response.Write("<span class=""badge team-farm-score-" & TeamID1 & """ style=""font-size: 1.9em; background-color: #fff; color: #444444;"">" & TeamScore1 & "</span>")
-												Response.Write("<img src=""" & TeamLogo1 & """ width=""29"" /> <span style=""font-size: 15px""><b>" & TeamName1 & "</b></span>")
+											Response.Write("<li class=""list-group-item team-slffl-box-" & TeamID1 & """>")
+												Response.Write("<span class=""badge team-slffl-score-" & TeamID1 & """ style=""font-size: 1.9em; background-color: #fff; color: #444444;"">" & TeamScore1 & "</span>")
+												Response.Write("<img src=""" & TeamLogo1 & """ width=""29"" /> <span style=""font-size: 15px; color: #2d2d2d;""><b>" & TeamName1 & "</b></span>")
 												Response.Write("<div class=""progress"" style=""height: 1px; margin-top: 4px; margin-bottom: 0; padding-bottom: 0;"">")
 													Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor1 & " team-slffl-progress-" & TeamID1 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent1 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent1 & "%"">")
 														Response.Write("<span class=""sr-only team-slffl-progress-sr-" & TeamID1 & """>" & TeamPMRPercent1 & "%</span>")
 													Response.Write("</div>")
 												Response.Write("</div>")
+												Response.Write("<span style=""display: none;"" class=""team-slffl-touchdowns-" & TeamID1 & """>" & TeamTDS1 & "</span>")
 											Response.Write("</li>")
-											Response.Write("<li class=""list-group-item team-farm-box-" & TeamID2 & """>")
-												Response.Write("<span class=""badge team-farm-score-" & TeamID2 & """ style=""font-size: 1.9em; background-color: #fff; color: #444444;"">" & TeamScore2 & "</span>")
-												Response.Write("<img src=""" & TeamLogo2 & """ width=""29"" /> <span style=""font-size: 15px""><b>" & TeamName2 & "</b></span>")
+											Response.Write("<li class=""list-group-item team-slffl-box-" & TeamID2 & """>")
+												Response.Write("<span class=""badge team-slffl-score-" & TeamID2 & """ style=""font-size: 1.9em; background-color: #fff; color: #444444;"">" & TeamScore2 & "</span>")
+												Response.Write("<img src=""" & TeamLogo2 & """ width=""29"" /> <span style=""font-size: 15px; color: #2d2d2d;""><b>" & TeamName2 & "</b></span>")
 												Response.Write("<div class=""progress"" style=""height: 1px; margin-top: 4px; margin-bottom: 0; padding-bottom: 0;"">")
 													Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColor2 & " team-slffl-progress-" & TeamID2 & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercent2 & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercent2 & "%"">")
 														Response.Write("<span class=""sr-only team-slffl-progress-sr-" & TeamID2 & """>" & TeamPMRPercent2 & "%</span>")
 													Response.Write("</div>")
 												Response.Write("</div>")
+												Response.Write("<span style=""display: none;"" class=""team-slffl-touchdowns-" & TeamID2 & """>" & TeamTDS2 & "</span>")
 											Response.Write("</li>")
 										Response.Write("</ul>")
+										Response.Write("</a>")
 									Response.Write("</div>")
 					
 								Next
 					
-							Response.Write("</div>")
-									
-							MatchupString = ""
-							TeamDetails = ""
-							MatchupTrail = "0,"
 %>
-						</div>
-						
-						<div class="col-sm-12">
-<%
-							Response.Write("<div class=""row"">")
-							
-								TOTAL_Points_FARM = TOTAL_Points_FARM / 2
-								TOTAL_PMR_FARM = TOTAL_PMR_FARM / 2
-								TOTAL_Points_SLFFL = TOTAL_Points_SLFFL / 2
-								TOTAL_PMR_SLFFL = TOTAL_PMR_SLFFL / 2
-								
-								TeamPMRColorSLFFL = "success"
-								If TOTAL_PMR_SLFFL < 3852 Then TeamPMRColorSLFFL = "warning"
-								If TOTAL_PMR_SLFFL < 1932 Then TeamPMRColorSLFFL = "danger"
-								
-								TeamPMRColorFARM = "success"
-								If TOTAL_PMR_FARM < 3852 Then TeamPMRColorFARM = "warning"
-								If TOTAL_PMR_FARM < 1932 Then TeamPMRColorFARM = "danger"
-								
-								TeamPMRPercentSLFFL = (TOTAL_PMR_SLFFL * 100) / 5760
-								TeamPMRPercentFARM  = (TOTAL_PMR_FARM * 100) / 5760
-								
-								arSLFFLScores = Split(SLFFLTeamTrailScore, ",")
-								arFARMScores = Split(FARMTeamTrailScore, ",")
-								
-								'medianSLFFL = Median(arSLFFLScores)
-								'medianFARM = Median(arFARMScores)
-								
-								averageSLFFL = Average(arSLFFLScores)
-								averageFARM = Average(arFARMScores)
-								
-								Response.Write("<div class=""col-sm-6"">")
-									Response.Write("<ul class=""list-group"">")
-										Response.Write("<li class=""list-group-item"">")
-											Response.Write("<span class=""badge"" style=""font-size: 3em; background-color: #fff; color: #444444;"">" & TOTAL_Points_SLFFL & "</span>")
-											Response.Write("<img src=""http://data.samelevel.net/build/img/icons/slffl.jpg"" style=""float: left; padding-right: 20px;"" />")
-											Response.Write("<div style=""font-size: 16px""><b>" & medianSLFFL & "</b> <span style=""font-size: 14px;""><i>Median</i></span></div>")
-											Response.Write("<div style=""font-size: 16px""><b>" & averageSLFFL & "</b> <span style=""font-size: 14px;""><i>Average</i></span></div>")
-											Response.Write("<div class=""clearfix""></div>")
-											Response.Write("<div class=""progress"" style=""height: 2px; margin-top: 5px; margin-bottom: 0; padding-bottom: 0;"">")
-												Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColorSLFFL & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercentSLFFL & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercentSLFFL & "%"">")
-													Response.Write("<span class=""sr-only"">" & TeamPMRPercentSLFFL & "%</span>")
-												Response.Write("</div>")
-											Response.Write("</div>")
-										Response.Write("</li>")
-									Response.Write("</ul>")
-								Response.Write("</div>")
-								Response.Write("<div class=""col-sm-6"">")
-									Response.Write("<ul class=""list-group"">")
-										Response.Write("<li class=""list-group-item"">")
-											Response.Write("<span class=""badge"" style=""font-size: 3em; background-color: #fff; color: #444444;"">" & TOTAL_Points_FARM & "</span>")
-											Response.Write("<img src=""http://data.samelevel.net/build/img/icons/farm.jpg"" style=""float: left; padding-right: 20px;"" />")
-											Response.Write("<div style=""font-size: 16px""><b>" & medianFARM & "</b> <span style=""font-size: 14px;""><i>Median</i></span></div>")
-											Response.Write("<div style=""font-size: 16px""><b>" & averageFARM & "</b> <span style=""font-size: 14px;""><i>Average</i></span></div>")
-											Response.Write("<div class=""clearfix""></div>")
-											Response.Write("<div class=""progress"" style=""height: 2px; margin-top: 5px; margin-bottom: 0; padding-bottom: 0;"">")
-												Response.Write("<div class=""progress-bar progress-bar-" & TeamPMRColorFARM & """ role=""progressbar"" aria-valuenow=""" & TeamPMRPercentFARM & """ aria-valuemin=""0"" aria-valuemax=""100"" style=""width: " & TeamPMRPercentFARM & "%"">")
-													Response.Write("<span class=""sr-only"">" & TeamPMRPercentFARM & "%</span>")
-												Response.Write("</div>")
-											Response.Write("</div>")
-										Response.Write("</li>")
-									Response.Write("</ul>")
-								Response.Write("</div>")
-					
-							Response.Write("</div>")
-%>	
-						</div>
 						
 					</div>
 					

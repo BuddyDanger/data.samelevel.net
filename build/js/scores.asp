@@ -27,6 +27,25 @@ $(function () {
 					var scoreBox1 = document.getElementsByClassName('team-slffl-score-' + data["teamid"])[0]
 					var scoreBox2 = document.getElementsByClassName('team-slffl-score-' + data["teamid"])[1]
 					
+					var touchdownBox1 = document.getElementsByClassName('team-slffl-touchdowns-' + data["teamid"])[0]
+					var touchdownBox2 = document.getElementsByClassName('team-slffl-touchdowns-' + data["teamid"])[1]
+					
+					if (parseFloat(touchdownBox1.innerText) < parseFloat(data["teamtds"])) {
+						var sound = new Howl({
+							src: ['/build/sounds/bapes.wav'],
+							autoplay: true,
+							loop: false,
+							volume: 1,
+							onend: function() { console.log('Finished!'); }
+						});
+						alert('touchdown');
+					}
+					
+					touchdownBox1.innerText = data["teamtds"];
+					touchdownBox2.innerText = data["teamtds"];
+					
+					console.log(data["teamtds"]);
+					
 					if (parseFloat(scoreBox1.innerText) != parseFloat(data["teamscore"])) {
 						var scoreAnimation1 = new CountUp(scoreBox1, scoreBox1.innerText, data["teamscore"], 2, 4);
 						scoreAnimation1.start();
@@ -41,7 +60,7 @@ $(function () {
 			});
 			
 		}
-	
+		
 	}
 	
 	function updateFARM() {
